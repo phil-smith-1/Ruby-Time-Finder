@@ -12,22 +12,30 @@ class Dates
 
   def get_dates
     unless start_date.nil? || end_date.nil? || input_time.nil?
-      weekday = input_time.wday
-      dates_to_return = []
-      (start_date..end_date).each do |date|
-        if date.wday == weekday && !dates_to_exclude.include?(date.new_offset)
-          dates_to_return << date.strftime("%d/%m/%Y")
-        end
+      valid_dates = (start_date..end_date).select do |date|
+        same_weekday?(date, input_time) && not_excluded?(date)
       end
 
-      puts dates_to_return
-      dates_to_return
+      formatted_dates = format_dates(valid_dates)
+
+      puts formatted_dates
+      formatted_dates
     else
       puts 'Dates are incorrectly formatted.'
       []
     end
   end
+
+  private
   
+  def same_weekday?(date1, date2)
+  	date1.wday == date2.wday
+  end
+
+  def not_excluded?(date)
+  	!dates_to_exclude.include?(date.new_offset)
+  end
+
   def parse_date(date)
     if date.is_a? Date
       date.new_offset
@@ -46,5 +54,13 @@ class Dates
       parsed_dates << parse_date(date)
     end
     parsed_dates
+  end
+
+  def format_dates(dates)
+  	formatted_dates = []
+  	dates.each do |date|
+  		formatted_dates << date.strftime("%d/%m/%Y")
+  	end
+  	formatted_dates
   end
 end
